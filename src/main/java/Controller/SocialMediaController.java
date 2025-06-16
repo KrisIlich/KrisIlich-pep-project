@@ -2,6 +2,7 @@ package Controller;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
@@ -18,6 +19,14 @@ public class SocialMediaController {
         Javalin app = Javalin.create();
         app.get("example-endpoint", this::exampleHandler);
 
+        app.post("/register", this::postRegisterHandler);
+        app.post("/login", this::postLoginHandler);
+        app.post("/messages", this::postMessageHandler);
+        app.get("/messages", this::getAllMessagesHandler);
+        app.get("/messages/{message_id}", this::getMessageByIDHandler);
+        app.delete("/messages/{message_id}", this::deleteMessageByIDHandler);
+        app.patch("/messages/{message_id}", this::updateMessageByIDHandler);
+        app.get("/accounts/{account_id}/messages", this::getAllMessagesByUserHandler);
         return app;
     }
 
@@ -28,6 +37,39 @@ public class SocialMediaController {
     private void exampleHandler(Context context) {
         context.json("sample text");
     }
+
+    private void postRegisterHandler(Context context) {
+        //add account
+    }
+
+    private void postLoginHandler(Context context) {
+        //verify login
+    }
+
+    private void postMessageHandler(Context context) {
+        //create new message
+    }
+
+    private void getAllMessagesHandler(Context context) {
+        //get all messages
+    }
+
+    private void getMessageByIDHandler(Context context) {
+        //get message by id
+    }
+
+    private void deleteMessageByIDHandler(Context context) {
+        //delete message by id
+    }
+
+    private void updateMessageByIDHandler(Context context) {
+        //update message by id
+    }
+
+    private void getAllMessagesByUserHandler(Context context) {
+        //get all messages from a specific user
+    }
+ 
 
 
 }
