@@ -2,7 +2,17 @@ package Controller;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+
+import java.util.List;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import Model.Account;
+import Model.Message;
+import Service.AccountService;
+import Service.MessageService;
 
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
@@ -15,6 +25,17 @@ public class SocialMediaController {
      * suite must receive a Javalin object from this method.
      * @return a Javalin app object which defines the behavior of the Javalin controller.
      */
+
+    AccountService accountService;
+    MessageService messageService;
+
+    public SocialMediaController() {
+        this.accountService = new AccountService();
+        this.messageService = new MessageService();
+    }
+
+
+
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         app.get("example-endpoint", this::exampleHandler);
@@ -38,38 +59,80 @@ public class SocialMediaController {
         context.json("sample text");
     }
 
-    private void postRegisterHandler(Context context) {
-        //add account
+    private void postRegisterHandler(Context context) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(context.body(), Account.class);
+        Account addedAccount = accountService.registerAccount(account);
+        if(addedAccount != null){
+            context.json(mapper.writeValueAsString(addedAccount));
+        } else {
+            context.status(400);
+        }
+
     }
 
-    private void postLoginHandler(Context context) {
-        //verify login
+    private void postLoginHandler(Context context) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(context.body(), Account.class);
+        Account loginAccount = accountService.accountLogin(account);
+        if (loginAccount != null){
+            context.json(mapper.writeValueAsString(loginAccount));
+        } else {
+            context.status(401);
+        }
     }
 
-    private void postMessageHandler(Context context) {
-        //create new message
+    private void postMessageHandler(Context context) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Message message = mapper.readValue(context.body(), Message.class);
+        Message postMessage = messageService.createMessage(message);
+        if (postMessage != null){
+            context.json(mapper.writeValueAsString(postMessage));
+        } else {
+            context.status(400);
+        }
     }
 
     private void getAllMessagesHandler(Context context) {
-        //get all messages
+        List<Message> messages = messageService.getAllMessages();
+        context.json(messages);
     }
 
     private void getMessageByIDHandler(Context context) {
-        //get message by id
+        int messageID = Integer.parseInt(context.pathParam("message_id"));
+        Message found = messageService.getMessageById(messageID);
+        if (found != null){
+            context.json(found);
+        }
     }
 
     private void deleteMessageByIDHandler(Context context) {
-        //delete message by id
+        int messageID = Integer.parseInt(context.pathParam("message_id"));
+        Message deleted = messageService.getMessageById(messageID);
+        context.status(200);
+        if (deleted != null){
+            context.json(deleted);
+        }
     }
 
-    private void updateMessageByIDHandler(Context context) {
-        //update message by id
+    private void updateMessageByIDHandler(Context context) throws JsonProcessingException {
+        int messageID = Integer.parseInt(context.pathParam("message_id"));
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(context.body());
+        String newText = root.get("message_text").asText();
+
+        Message updated = messageService.updateMessageById(messageID, newText);
+        if (updated != null) {
+            context.json(updated);
+        } else {
+            context.status(400);
+        }
     }
 
     private void getAllMessagesByUserHandler(Context context) {
-        //get all messages from a specific user
+        int accountId = Integer.parseInt(context.pathParam("account_id"));
+        List<Message> messages = messageService.getAllMessagesFromAccount(accountId);
+        context.json(messages);
     }
- 
-
 
 }

@@ -3,11 +3,6 @@ package DAO;
 import java.sql.Connection;
 import Model.Account;
 import Util.ConnectionUtil;
-import jakarta.servlet.http.HttpServletResponse;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -43,15 +38,16 @@ public class AccountDAO {
             String sql = "SELECT * FROM account WHERE username = ? AND password = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
             
-            ps.setString(1, account.username);
-            ps.setString(2, account.password);
+            ps.setString(1, account.getUsername());
+            ps.setString(2, account.getPassword());
 
             ResultSet resultSet = ps.executeQuery();
 
             if (resultSet.next()) {
+                int id = resultSet.getInt("account_id");
                 String username = resultSet.getString("username");
                 String password = resultSet.getString("password");
-                return new Account(username, password);
+                return new Account(id, username, password);
             } 
             
             return null;
