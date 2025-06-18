@@ -3,6 +3,7 @@ package DAO;
 import java.sql.Connection;
 import Model.Account;
 import Util.ConnectionUtil;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -40,17 +41,25 @@ public class AccountDAO {
         Connection connection = ConnectionUtil.getConnection();
         try {
             String sql = "SELECT * FROM account WHERE username = ? AND password = ?";
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(sql);
             
+            ps.setString(1, account.username);
+            ps.setString(2, account.password);
 
+            ResultSet resultSet = ps.executeQuery();
+
+            if (resultSet.next()) {
+                String username = resultSet.getString("username");
+                String password = resultSet.getString("password");
+                return new Account(username, password);
+            } 
+            
+            return null;
+        
 
         } catch(SQLException e) {
             System.out.println(e);
         }
-        return account;
-    }
-
-    public Account getAllMessagesFromAccount(int id) {
         return null;
     }
 
