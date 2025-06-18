@@ -87,7 +87,7 @@ public class SocialMediaController {
         Message message = mapper.readValue(context.body(), Message.class);
         Message postMessage = messageService.createMessage(message);
         if (postMessage != null){
-            context.json(mapper.writeValueAsString(postMessage));
+            context.json(postMessage);
         } else {
             context.status(400);
         }
@@ -108,7 +108,7 @@ public class SocialMediaController {
 
     private void deleteMessageByIDHandler(Context context) {
         int messageID = Integer.parseInt(context.pathParam("message_id"));
-        Message deleted = messageService.getMessageById(messageID);
+        Message deleted = messageService.deleteMessageById(messageID);
         context.status(200);
         if (deleted != null){
             context.json(deleted);
